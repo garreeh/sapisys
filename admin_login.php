@@ -7,13 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 if (isset($_SESSION['user_id'])) {
-  if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == "1") {
-    // If the user is an admin, redirect to the admin dashboard
-    header("Location: /appointment/views/admin/dashboard.php");
-  } else {
-    // If the user is not an admin, redirect to the user dashboard
-    header("Location: /appointment/index.php");
-  }
+  header("Location: /sapisys/admin/views/dashboard.php");
   exit();
 }
 
@@ -66,14 +60,14 @@ if (isset($_SESSION['user_id'])) {
 
                   <form class="user" id="loginForm" onsubmit="submitForm(); return false;">
                     <div class="form-group">
-                      <input type="text" class="form-control form-control-user" placeholder="Enter Username | User Code"
-                        name="username_or_email" id="username_or_email" value="" required>
+                      <input type="text" class="form-control form-control-user" placeholder="Enter User Code"
+                        name="username" id="username" value="" required>
                     </div>
 
                     <div class="form-group">
                       <div class="input-group">
                         <input type="password" class="form-control form-control-user" placeholder="Password"
-                          name="user_password" id="user_password" required>
+                          name="password" id="password" required>
                         <div class="input-group-append">
                           <span class="input-group-text" id="togglePassword">
                             <i class="fa fa-eye" aria-hidden="true"></i>
@@ -82,18 +76,7 @@ if (isset($_SESSION['user_id'])) {
                       </div>
                     </div>
 
-                    <!-- <div class="form-group">
-                      <div class="custom-control custom-checkbox small">
-                        <input type="checkbox" class="custom-control-input" id="customCheck"
-                          onchange="toggleRememberMe()">
-                        <label class="custom-control-label" for="customCheck">Remember Me</label>
-                      </div>
-
-                      <input type="hidden" id="remember_me" name="remember_me" value="0">
-                    </div> -->
-
-                    <button type="button" class="btn btn-primary btn-user btn-block"
-                      onclick="submitForm()">Login</button>
+                    <button type="button" class="btn btn-primary btn-user btn-block" onclick="submitForm()">Login</button>
                     <hr>
                   </form>
 
@@ -148,18 +131,6 @@ if (isset($_SESSION['user_id'])) {
     }
   });
 
-  function toggleRememberMe() {
-    var rememberMeCheckbox = document.getElementById('customCheck');
-    var rememberMeInput = document.getElementById('remember_me');
-
-    // Check if rememberMeInput is not null
-    if (rememberMeInput !== null) {
-      rememberMeInput.value = rememberMeCheckbox.checked ? "1" : "0";
-    }
-
-    console.log(rememberMeInput);
-  }
-
   function showToast(message) {
     Toastify({
       text: message,
@@ -172,32 +143,23 @@ if (isset($_SESSION['user_id'])) {
   }
 
   function submitForm() {
-    // Get form data
-    var usernameOrEmail = document.getElementById('username_or_email').value;
-    var user_password = document.getElementById('user_password').value;
-    var rememberMe = document.getElementById('remember_me').value; // Fix: use .value instead of .checked
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
 
-    // Create data object
     var data = {
-      username_or_email: usernameOrEmail,
-      user_password: user_password,
-      remember_me: rememberMe
+      username: username,
+      password: password,
     };
 
     $.ajax({
       type: 'POST',
-      url: '../controllers/login_process.php',
+      url: '/sapisys/admin/controllers/login_process.php',
       data: data,
       dataType: 'json',
       success: function(response) {
         console.log(response);
         if (response.success) {
-          // Check if the user is an admin
-          if (response.is_admin === "1") {
-            window.location.href = "/appointment/views/admin/dashboard.php"; // Redirect to admin page
-          } else {
-            window.location.href = "/appointment/views/user/user_dashboard.php"; // Redirect to user page
-          }
+          window.location.href = "/sapisys/admin/views/dashboard.php";
         } else {
           showToast(response.message);
         }
